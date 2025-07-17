@@ -1,0 +1,58 @@
+/*
+#cats {
+  float: left;
+  width: 400px;
+}
+
+#dogs {
+  float: left;
+  margin-left: 50px;
+}
+*/
+
+body {
+    margin: 20px;
+}
+
+.wrapper {
+    display: flex;
+}
+
+table {
+    border-spacing: 0;
+    border-collapse: collapse;
+
+}
+
+dd {
+    margin: 0;
+
+}
+
+.info {
+    color: #666;
+}
+
+dt {
+    font-size: .6em;
+}
+
+.entries {
+    text-align: left;
+
+    width: 100%;
+
+    tr {
+        border-bottom: 1px solid #CCC;
+    }
+
+    th:not(:first-child),
+    td:not(:first-child) {
+        padding: 3px 6px 3px 12px;
+    }
+}
+
+.cats, .dogs {
+    border: 1px solid green;
+    padding: 40px 60px;
+}

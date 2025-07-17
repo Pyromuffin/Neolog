@@ -1,0 +1,38 @@
+@(neologismForm: Form[NeologismSubmission], neologisms: Seq[NeologismSubmission], selectedEntry: Option[NeologismSubmission])(implicit request: MessagesRequestHeader)
+
+@import helper._
+
+
+@main("Cat & Dog database") {
+<div class="wrapper">
+
+  <div class="submissions">
+    <h2>The Neolog:</h2>
+
+    @form(routes.Application.insertNeologism) {
+    @inputText(neologismForm("quotation"))
+    @inputText(neologismForm("attribution"))
+
+    @CSRF.formField
+
+    <input type="submit"/>
+    }
+
+    @for(entry <- selectedEntry) {
+    <h3>Neologism "@entry.quotation" already submitted by @entry.attribution on @entry.timestamp</h3>
+    <table class="entries">
+      <tr><td>@entry.quotation</td><td>@entry.attribution</td><td>@entry.timestamp</td></tr>
+    </table>
+    }
+
+    <h2>Previously attributed neologisms:</h2>
+    <table class="entries">
+      <tr><th>Quotation</th><th>Attribution</th><th>Timestamp</th><th>Tonitrus</th></tr>
+      @for(c <- neologisms){
+      <tr><td>@c.quotation</td><td>@c.attribution</td><td>@c.timestamp</td><td>@Markov.SuperTonitrus(c.quotation)</td></tr>
+      }
+    </table>
+  </div>
+
+</div>
+}

@@ -1,0 +1,15 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                           controllers.Application.index(submissionID : Option[Long])
+#GET     /show                       controllers.Application.index(submission : Option[NeologismSubmission])
+
+
+# Home page
+POST    /insert/submission          controllers.Application.insertNeologism
+
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.at(path="/public", file)
