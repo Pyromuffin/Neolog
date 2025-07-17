@@ -60,23 +60,23 @@ a mapping for type R
 
 
 
-
+  val textPath = "./words_alpha.txt"
 
   // run markov counts
   println("getting counts")
-  val counts = Markov.GetLetterCounts("/home/kelly/Downloads/words_alpha.txt")
+  val counts = Markov.GetLetterCounts(textPath)
 
   println("getting probabilities")
   val probabilities = Markov.CalculateProbabilities(counts)
 
-  val digramCounts = Markov.GetDigramCounts("/home/kelly/Downloads/words_alpha.txt")
+  val digramCounts = Markov.GetDigramCounts(textPath)
   val digramProbabilities = Markov.CalculateDigramProbabilities(digramCounts)
 
-  val oneGrams = Markov.GetNgramCounts("/home/kelly/Downloads/words_alpha.txt", 1)
-  val twoGrams = Markov.GetNgramCounts("/home/kelly/Downloads/words_alpha.txt", 2)
-  val threeGrams = Markov.GetNgramCounts("/home/kelly/Downloads/words_alpha.txt", 3)
-  val fourGrams = Markov.GetNgramCounts("/home/kelly/Downloads/words_alpha.txt", 4)
-  //Markov.GetWordStatistics("/home/kelly/Downloads/words_alpha.txt")
+  val oneGrams = Markov.GetNgramCounts(textPath, 1)
+  val twoGrams = Markov.GetNgramCounts(textPath, 2)
+  val threeGrams = Markov.GetNgramCounts(textPath, 3)
+  val fourGrams = Markov.GetNgramCounts(textPath, 4)
+  //Markov.GetWordStatistics(textPath)
 
 
   def index(submissionID: Option[Long]) = Action.async { implicit request =>

@@ -5,3 +5,5 @@
 hs_err_pid*
 /project
 /target
+/.idea
+.bsp/sbt.json
