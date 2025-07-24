@@ -5,35 +5,40 @@ import dao.{CatDAO, DogDAO, NeologismDAO}
 import javax.inject.Inject
 import models.{Cat, Dog, NeologismSubmission}
 import play.api.data.Form
-import play.api.data.Forms._
-import play.api.mvc._
+import play.api.data.Forms.*
+import play.api.mvc.*
 import play.api.data.validation.Constraints.{max, min}
+import play.api.inject.ApplicationLifecycle
 
 import scala.concurrent.{ExecutionContext, Future}
+
+
+enum SubmissionErrors {
+  case InvalidString, AlreadyFound, MissingFields
+  val errorStrings = Array(
+    InvalidString -> "Neologism must contain at least four characters and lack whitespace or numbers.",
+    AlreadyFound -> "Neologism already found in the corpus of all English.",
+    MissingFields -> "Neologism submission lacks essential fields."
+  )
+}
+
 
 class Application @Inject() (
     catDao: CatDAO,
     dogDao: DogDAO,
     neologismDao: NeologismDAO,
-    mcc: MessagesControllerComponents
+    mcc: MessagesControllerComponents,
+    lifecycle: ApplicationLifecycle,
+    startup: ApplicationStart
 )(implicit executionContext: ExecutionContext) extends MessagesAbstractController(mcc) {
 
-  val catForm: Form[Cat] = Form(
-    mapping(
-      "name" -> text(minLength = 10),
-      "color" -> text(),
-      "cuteness" -> number()
-    )(Cat.apply)(Cat.unapply)
-  )
 
-  val dogForm: Form[Dog] = Form(
-    mapping(
-      "name" -> text(),
-      "color" -> text()
-    )(Dog.apply)(Dog.unapply)
-  )
-
-
+  lifecycle.addStopHook { () =>
+    Future.successful {
+      println("DB stopped.")
+      startup.server.stop()
+    }
+  }
   /*
     def mapping[R, A1, A2](a1: (String, Mapping[A1]), a2: (String, Mapping[A2]))(apply: Function2[A1, A2, R])(unapply: Function1[R, Option[(A1, A2)]]): Mapping[R] = {
     new ObjectMapping2(apply, unapply, a1, a2)
@@ -59,7 +64,6 @@ a mapping for type R
   )
 
 
-
   val textPath = "./words_alpha.txt"
 
   // run markov counts
@@ -76,10 +80,9 @@ a mapping for type R
   val twoGrams = Markov.GetNgramCounts(textPath, 2)
   val threeGrams = Markov.GetNgramCounts(textPath, 3)
   val fourGrams = Markov.GetNgramCounts(textPath, 4)
-  //Markov.GetWordStatistics(textPath)
 
 
-  def index(submissionID: Option[Long]) = Action.async { implicit request =>
+  def index(submissionID: Option[Long], error: Option[Int]) = Action.async { implicit request =>
 
     val allFuture = neologismDao.all()
     val selectedFuture = neologismDao.lookupByID(submissionID)
@@ -88,19 +91,30 @@ a mapping for type R
       neologisms <- allFuture
       selected <- selectedFuture
     } yield {
-      Ok(views.html.index(neologismForm, neologisms, selected))
+      Ok(views.html.index(neologismForm, neologisms, selected, None))
     }
 
+  }
+
+  def ValidateQuotation(quote : String) : Boolean =  {
+    quote.matches("^[a-zA-Z]{4,}$")
   }
 
 
   def insertNeologism = Action.async { implicit request =>
     val submission: NeologismSubmission = neologismForm.bindFromRequest().get
 
-    val result = neologismDao.lookupOrInsert(submission).map{ found =>
-        Redirect(routes.Application.index(found))
+    if(ValidateQuotation(submission.quotation)) {
+
+      neologismDao.lookupOrInsert(submission).map { found =>
+        Redirect(routes.Application.index(found, None))
+      }
+
+    } else {
+      val error = Some(SubmissionErrors.InvalidString.ordinal)
+      Future(Redirect(routes.Application.index(None, error)))
     }
-    result
+
   }
 
 }

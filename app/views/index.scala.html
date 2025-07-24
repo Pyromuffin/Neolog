@@ -1,4 +1,4 @@
-@(neologismForm: Form[NeologismSubmission], neologisms: Seq[NeologismSubmission], selectedEntry: Option[NeologismSubmission])(implicit request: MessagesRequestHeader)
+@(neologismForm: Form[NeologismSubmission], neologisms: Seq[NeologismSubmission], selectedEntry: Option[NeologismSubmission], errorText : Option[String])(implicit request: MessagesRequestHeader)
 
 @import helper._
 
@@ -16,6 +16,10 @@
     @CSRF.formField
 
     <input type="submit"/>
+    }
+
+    @for(error <- errorText) {
+      <p>@error</p>
     }
 
     @for(entry <- selectedEntry) {

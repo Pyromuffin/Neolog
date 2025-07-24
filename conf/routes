@@ -3,7 +3,7 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.index(submissionID : Option[Long])
+GET     /                           controllers.Application.index(submissionID : Option[Long], submissionError : Option[Int])
 #GET     /show                       controllers.Application.index(submission : Option[NeologismSubmission])
 
 

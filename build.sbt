@@ -1,7 +1,8 @@
 name := """neolog"""
 organization := "pyromuffin"
+maintainer := "pyromuffin@gmail.com"
 
-version := "1.0-SNAPSHOT"
+version := "1.2-SNAPSHOT"
 lazy val scala3 = "3.3.4"
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
@@ -14,7 +15,6 @@ libraryDependencies ++= Seq("org.playframework" %% "play-slick" % "6.1.1",
 "org.playframework" %% "play-slick-evolutions" % "6.1.1",
 "com.h2database" % "h2" % "2.3.232"
 )
-
 
 scalacOptions ++= Seq("-feature", "-Werror")
 
