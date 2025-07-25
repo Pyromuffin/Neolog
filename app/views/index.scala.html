@@ -3,7 +3,7 @@
 @import helper._
 
 
-@main("Cat & Dog database") {
+@main("The Neolog") {
 <div class="wrapper">
 
   <div class="submissions">
@@ -12,6 +12,7 @@
     @form(routes.Application.insertNeologism) {
     @inputText(neologismForm("quotation"))
     @inputText(neologismForm("attribution"))
+    @inputText(neologismForm("explanation"))
 
     @CSRF.formField
 
@@ -19,7 +20,7 @@
     }
 
     @for(error <- errorText) {
-      <p>@error</p>
+      <p><font color="red"><blink>Submission Error: @error</blink></font></p>
     }
 
     @for(entry <- selectedEntry) {
@@ -31,9 +32,9 @@
 
     <h2>Previously attributed neologisms:</h2>
     <table class="entries">
-      <tr><th>Quotation</th><th>Attribution</th><th>Timestamp</th><th>Tonitrus</th></tr>
+      <tr><th>Quotation</th><th>Attribution</th><th>Explanation</th><th>Timestamp</th><th>Tonitrus</th></tr>
       @for(c <- neologisms){
-      <tr><td>@c.quotation</td><td>@c.attribution</td><td>@c.timestamp</td><td>@Markov.SuperTonitrus(c.quotation)</td></tr>
+      <tr><td>@c.quotation</td><td>@c.attribution</td><td>@c.explanation</td><td>@c.timestamp</td><td>@Markov.SuperTonitrus(c.quotation)</td></tr>
       }
     </table>
   </div>

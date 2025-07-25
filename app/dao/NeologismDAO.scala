@@ -2,7 +2,7 @@ package dao
 
 import scala.concurrent.{ExecutionContext, Future}
 import javax.inject.Inject
-import models.{Cat, NeologismSubmission}
+import models.{NeologismSubmission}
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.db.slick.HasDatabaseConfigProvider
 import slick.jdbc.JdbcProfile
@@ -50,6 +50,6 @@ class NeologismDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProv
     def rarity = column[Int]("RARITY")
     def tonitrus = column[Float]("TONITRUS")
 
-    def * = (quotation, attribution, timestamp) <> (NeologismSubmission.tupled, NeologismSubmission.unapply)
+    def * = (quotation, attribution, explanation, timestamp) <> (NeologismSubmission.tupled, NeologismSubmission.unapply)
   }
 }

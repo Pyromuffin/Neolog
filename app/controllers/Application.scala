@@ -1,9 +1,9 @@
 package controllers
 
-import dao.{CatDAO, DogDAO, NeologismDAO}
+import dao.{NeologismDAO}
 
 import javax.inject.Inject
-import models.{Cat, Dog, NeologismSubmission}
+import models.{NeologismSubmission}
 import play.api.data.Form
 import play.api.data.Forms.*
 import play.api.mvc.*
@@ -13,19 +13,24 @@ import play.api.inject.ApplicationLifecycle
 import scala.concurrent.{ExecutionContext, Future}
 
 
-enum SubmissionErrors {
-  case InvalidString, AlreadyFound, MissingFields
+
+object SubmissionErrors {
   val errorStrings = Array(
-    InvalidString -> "Neologism must contain at least four characters and lack whitespace or numbers.",
+    InvalidString -> "Neologism must contain at least four characters, not exceed 32 characters, and lack whitespace or numbers or punctuation.",
     AlreadyFound -> "Neologism already found in the corpus of all English.",
-    MissingFields -> "Neologism submission lacks essential fields."
+    MissingAttribution -> "Neologism submission lacks attribution.",
+    MissingExplanation -> "Neologism submission lacks explanation.",
+    AttributionTooLong -> "Attribution must be less than 64 characters, and only contain whitespace or alphanumeric characters",
+    ExplanationTooLong -> "Explanation must be less than 100 characters, and only contain whitespace or alphanumeric characters",
   )
+}
+
+enum SubmissionErrors {
+  case InvalidString, AlreadyFound, MissingAttribution, MissingExplanation, AttributionTooLong, ExplanationTooLong
 }
 
 
 class Application @Inject() (
-    catDao: CatDAO,
-    dogDao: DogDAO,
     neologismDao: NeologismDAO,
     mcc: MessagesControllerComponents,
     lifecycle: ApplicationLifecycle,
@@ -55,9 +60,10 @@ a mapping for type R
    */
 
   val neologismForm: Form[NeologismSubmission] = Form(
-    mapping[NeologismSubmission, String, String](
+    mapping[NeologismSubmission, String, String, String](
       "quotation" -> text(),
       "attribution" -> text(),
+      "explanation" -> text(),
     )
     (NeologismSubmission.makeWithCurrentTime)
     (NeologismSubmission.getFormComponents)
@@ -91,30 +97,27 @@ a mapping for type R
       neologisms <- allFuture
       selected <- selectedFuture
     } yield {
-      Ok(views.html.index(neologismForm, neologisms, selected, None))
+      val errorText = error.map(SubmissionErrors.errorStrings(_)._2)
+      Ok(views.html.index(neologismForm, neologisms, selected, errorText))
     }
 
   }
 
-  def ValidateQuotation(quote : String) : Boolean =  {
-    quote.matches("^[a-zA-Z]{4,}$")
-  }
+
 
 
   def insertNeologism = Action.async { implicit request =>
     val submission: NeologismSubmission = neologismForm.bindFromRequest().get
 
-    if(ValidateQuotation(submission.quotation)) {
+    val error = submission.validate.map(_.ordinal)
 
-      neologismDao.lookupOrInsert(submission).map { found =>
-        Redirect(routes.Application.index(found, None))
-      }
-
-    } else {
-      val error = Some(SubmissionErrors.InvalidString.ordinal)
+    if (error.nonEmpty) {
       Future(Redirect(routes.Application.index(None, error)))
+    } else {
+      neologismDao.lookupOrInsert(submission).map { found =>
+        Redirect(routes.Application.index(found, error))
+      }
     }
-
   }
 
 }

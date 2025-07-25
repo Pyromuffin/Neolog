@@ -2,7 +2,7 @@ name := """neolog"""
 organization := "pyromuffin"
 maintainer := "pyromuffin@gmail.com"
 
-version := "1.2-SNAPSHOT"
+version := "1.4-SNAPSHOT"
 lazy val scala3 = "3.3.4"
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
