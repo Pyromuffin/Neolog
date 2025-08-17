@@ -108,13 +108,14 @@ a mapping for type R
 
   def insertNeologism = Action.async { implicit request =>
     val submission: NeologismSubmission = neologismForm.bindFromRequest().get
-
-    val error = submission.validate.map(_.ordinal)
+    val lowered = NeologismSubmission(submission.quotation.toLowerCase, submission.attribution, submission.explanation, submission.timestamp)
+    
+    val error = lowered.validate.map(_.ordinal)
 
     if (error.nonEmpty) {
       Future(Redirect(routes.Application.index(None, error)))
     } else {
-      neologismDao.lookupOrInsert(submission).map { found =>
+      neologismDao.lookupOrInsert(lowered).map { found =>
         Redirect(routes.Application.index(found, error))
       }
     }
