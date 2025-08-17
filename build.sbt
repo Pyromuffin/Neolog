@@ -1,6 +1,6 @@
 name := """neolog"""
-organization := "pyromuffin"
-maintainer := "pyromuffin@gmail.com"
+organization := "your org"
+maintainer := "your email"
 
 version := "1.4-SNAPSHOT"
 lazy val scala3 = "3.3.4"
@@ -17,10 +17,3 @@ libraryDependencies ++= Seq("org.playframework" %% "play-slick" % "6.1.1",
 )
 
 scalacOptions ++= Seq("-feature", "-Werror")
-
-
-// Adds additional packages into Twirl
-//TwirlKeys.templateImports += "pyromuffin.controllers._"
-
-// Adds additional packages into conf/routes
-// play.sbt.routes.RoutesKeys.routesImport += "pyromuffin.binders._"
